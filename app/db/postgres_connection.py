@@ -4,11 +4,11 @@ from app.config import dbname,user,password,port
 
 def create_db():
     conn = psycopg2.connect(
-        dbname='postgres',
-        user='postgres',
-        password='3266050418Max!',
+        dbname=dbname,
+        user=user,
+        password=password,
         host='localhost',
-        port=5432
+        port=port
     )
     try:
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)

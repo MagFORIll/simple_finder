@@ -1,4 +1,4 @@
 dbname = "postgres",
-user = "app_user",
+user = "postgres",
 password = "strong_password",
 port = 5432
