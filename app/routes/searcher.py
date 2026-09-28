@@ -1,15 +1,43 @@
-from fastapi import APIRouter
-from fastapi.templating import Jinja2Templates
-from fastapi import Request, Form
+from fastapi import APIRouter, HTTPException, Query
 
-router = APIRouter()
+from app.dependencies import get_document_service
+from app.schemas import DocumentResponse
 
-templates = Jinja2Templates(directory="templates")
 
-@router.get('/')
-def index(request: Request):
-    return templates.TemplateResponse(request, status_code=200, name='index.html')
+router = APIRouter(
+    prefix="/documents",
+    tags=["documents"],
+)
 
-@router.post('/post_data')
-def post_data(text=Form()):
-    return text
+
+@router.get(
+    "/search",
+    response_model=list[DocumentResponse],
+    summary="Search documents",
+)
+async def search_documents(
+    query: str = Query(
+        min_length=1,
+        description="Arbitrary text search query",
+    ),
+):
+    service = get_document_service()
+
+    return await service.search(query)
+
+
+@router.delete(
+    "/{document_id}",
+    status_code=204,
+    summary="Delete a document",
+)
+async def delete_document(document_id: int):
+    service = get_document_service()
+
+    deleted = await service.delete(document_id)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found",
+        )
